@@ -6,6 +6,7 @@ namespace Fireball.Weapons
     public abstract class BottleWeapon : MonoBehaviour, IWeapon
     {
         [SerializeField] protected WeaponData weaponData;
+        [SerializeField] protected PlayerStats playerStats;
 
         [Header("VFX")]
         [SerializeField] protected ParticleSystem fermentationEffect;
@@ -45,7 +46,8 @@ namespace Fireball.Weapons
         {
             if (!isFiring && currentAmmo < weaponData.maxAmmo)
             {
-                currentAmmo = Mathf.Min(weaponData.maxAmmo, currentAmmo + weaponData.fermentationRate * Time.deltaTime);
+                float mult = playerStats != null ? playerStats.fermentationMultiplier : 1.0f;
+                currentAmmo = Mathf.Min(weaponData.maxAmmo, currentAmmo + (weaponData.fermentationRate * mult) * Time.deltaTime);
                 
                 if (fermentationEffect != null && !fermentationEffect.isPlaying)
                     fermentationEffect.Play();

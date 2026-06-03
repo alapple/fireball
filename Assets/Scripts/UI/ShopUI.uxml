@@ -1,7 +1,20 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="ShopPanel" style="flex-grow: 1; visibility: hidden;">
-        <ui:Button text="Button" name="ArmorButton"/>
-        <ui:Button text="Button" name="FermentationButton"/>
-        <ui:Label text="Label" name="GoldLabel"/>
+    <ui:VisualElement name="ShopPanel" style="flex-grow: 1; display: none; background-color: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center;">
+        <ui:VisualElement style="width: 400px; padding: 20px; background-color: rgb(45, 45, 45); border-radius: 10px;">
+            <ui:Label text="THE BOTTLE SHOP" style="font-size: 30px; color: white; -unity-font-style: bold; margin-bottom: 20px; -unity-text-align: middle-center;" />
+            <ui:Label text="Gold: 0" name="GoldLabel" style="font-size: 20px; color: rgb(255, 215, 0); margin-bottom: 20px;" />
+            
+            <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
+                <ui:Label text="Fermentation (+20%)" style="color: white;" />
+                <ui:Button text="Buy (50g)" name="FermentationButton" style="width: 100px;" />
+            </ui:VisualElement>
+
+            <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 20px;">
+                <ui:Label text="Armor (+10% Res)" style="color: white;" />
+                <ui:Button text="Buy (75g)" name="ArmorButton" style="width: 100px;" />
+            </ui:VisualElement>
+
+            <ui:Button text="CLOSE" name="CloseButton" style="height: 40px; background-color: rgb(150, 50, 50); color: white;" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

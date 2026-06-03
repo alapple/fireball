@@ -13,6 +13,7 @@ namespace Fireball.Enemies
         [SerializeField] protected float attackRange = 2f;
         [SerializeField] protected float attackCooldown = 1.5f;
         [SerializeField] protected float damage = 10f;
+        [SerializeField] protected int goldValue = 10;
 
         protected float currentHealth;
         protected NavMeshAgent agent;
@@ -74,7 +75,22 @@ namespace Fireball.Enemies
 
         protected virtual void Die()
         {
-            // Drop gold or items?
+            if (player != null && player.TryGetComponent(out Fireball.Player.PlayerHealth playerHealth))
+            {
+                // Access stats through player health
+                // We'll assume the player has a way to get gold added
+                // For simplicity, let's find the ShopManager if it exists or just add to the ScriptableObject directly if we can find it.
+                // Better: Let's assume the ScriptableObject is a singleton-like asset or we find it.
+                // For now, let's just use the direct addition if we can get a reference.
+            }
+            
+            // Actually, let's use a simpler approach: Find any ShopManager and add gold there.
+            ShopManager shop = FindFirstObjectByType<ShopManager>();
+            if (shop != null)
+            {
+                shop.AddGold(goldValue);
+            }
+
             Destroy(gameObject);
         }
     }

@@ -5,21 +5,24 @@ namespace Fireball.Player
 {
     public class PlayerHealth : MonoBehaviour, IDamageable
     {
-        [Header("Health Settings")]
-        [SerializeField] private float maxHealth = 100f;
-        [SerializeField] private float swarmDecayThreshold = 3f; // Number of enemies to trigger decay
-        [SerializeField] private float swarmDecayDamage = 10f; // Damage per second when swarmed
+        [Header("Stats")]
+        [SerializeField] private PlayerStats playerStats;
+
+        [Header("Swarm Settings")]
+        [SerializeField] private float swarmDecayThreshold = 3f; 
+        [SerializeField] private float swarmDecayDamage = 10f; 
         [SerializeField] private float swarmDetectionRadius = 3f;
         [SerializeField] private LayerMask enemyLayer;
 
-        private float currentHealth;
-
-        public float CurrentHealth => currentHealth;
-        public float MaxHealth => maxHealth;
+        public float CurrentHealth => playerStats.currentHealth;
+        public float MaxHealth => playerStats.maxHealth;
 
         private void Start()
         {
-            currentHealth = maxHealth;
+            if (playerStats != null)
+            {
+                playerStats.currentHealth = playerStats.maxHealth;
+            }
         }
 
         private void Update()
@@ -29,8 +32,14 @@ namespace Fireball.Player
 
         public void TakeDamage(float amount)
         {
-            currentHealth -= amount;
-            if (currentHealth <= 0)
+            if (playerStats == null) return;
+
+            // Apply armor reduction (e.g., each armor level reduces damage by 10%, max 50%)
+            float reduction = Mathf.Min(playerStats.armorLevel * 0.1f, 0.5f);
+            float finalDamage = amount * (1f - reduction);
+
+            playerStats.currentHealth -= finalDamage;
+            if (playerStats.currentHealth <= 0)
             {
                 Die();
             }

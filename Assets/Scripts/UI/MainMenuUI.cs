@@ -6,6 +6,7 @@ namespace Fireball.UI
 {
     public class MainMenuUI : MonoBehaviour
     {
+        [SerializeField] private Fireball.ScriptableObjects.PlayerStats playerStats;
         private Button _playButton;
         private Button _settingsButton;
         private Button _quizButton;
@@ -37,6 +38,7 @@ namespace Fireball.UI
 
         private void OnPlayClicked()
         {
+            if (playerStats != null) playerStats.ResetStats();
             SceneManager.LoadScene(loadingSceneName);
         }
 

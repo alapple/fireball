@@ -18,4 +18,4 @@ MonoBehaviour:
   fireRate: 0.1
   damage: 5
   knockbackForce: 10
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 2839802619088296419, guid: 523b7a75238a9e7a4890d5592cdb6374, type: 3}
