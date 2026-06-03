@@ -1,5 +1,6 @@
 using UnityEngine;
 using Fireball.Core;
+using Fireball.ScriptableObjects;
 
 namespace Fireball.Player
 {

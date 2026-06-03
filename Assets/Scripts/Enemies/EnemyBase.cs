@@ -85,7 +85,7 @@ namespace Fireball.Enemies
             }
             
             // Actually, let's use a simpler approach: Find any ShopManager and add gold there.
-            ShopManager shop = FindFirstObjectByType<ShopManager>();
+            ShopManager shop = FindObjectOfType<ShopManager>();
             if (shop != null)
             {
                 shop.AddGold(goldValue);

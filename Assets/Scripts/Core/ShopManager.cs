@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using Fireball.ScriptableObjects;
 
 namespace Fireball.Core
 {
