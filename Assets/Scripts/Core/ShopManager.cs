@@ -1,53 +1,57 @@
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using UnityEngine.UIElements;
 
 namespace Fireball.Core
 {
     public class ShopManager : MonoBehaviour
     {
-        [Header("UI References")]
-        [SerializeField] private GameObject shopPanel;
-        [SerializeField] private TextMeshProUGUI goldText;
-        [SerializeField] private Button fermentationUpgradeButton;
-        [SerializeField] private Button armorUpgradeButton;
+        private VisualElement _shopPanel;
+        private Label _goldLabel;
+        private Button _fermentationUpgradeButton;
+        private Button _armorUpgradeButton;
 
         [Header("Shop Stats")]
         [SerializeField] private int fermentationUpgradeCost = 50;
         [SerializeField] private int armorUpgradeCost = 75;
 
-        private int playerGold = 100; // Placeholder starting gold
+        private int _playerGold = 100; // Placeholder starting gold
 
-        private void Start()
+        private void OnEnable()
         {
-            if (shopPanel != null) shopPanel.SetActive(false);
+            var root = GetComponent<UIDocument>().rootVisualElement;
+
+            _shopPanel = root.Q<VisualElement>("ShopPanel");
+            _goldLabel = root.Q<Label>("GoldLabel");
+            _fermentationUpgradeButton = root.Q<Button>("FermentationButton");
+            _armorUpgradeButton = root.Q<Button>("ArmorButton");
+
+            if (_shopPanel != null) _shopPanel.style.display = DisplayStyle.None;
             UpdateUI();
 
-            fermentationUpgradeButton.onClick.AddListener(UpgradeFermentation);
-            armorUpgradeButton.onClick.AddListener(UpgradeArmor);
+            if (_fermentationUpgradeButton != null) _fermentationUpgradeButton.clicked += UpgradeFermentation;
+            if (_armorUpgradeButton != null) _armorUpgradeButton.clicked += UpgradeArmor;
         }
 
         public void OpenShop()
         {
-            shopPanel.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            if (_shopPanel != null) _shopPanel.style.display = DisplayStyle.Flex;
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
             UpdateUI();
         }
 
         public void CloseShop()
         {
-            shopPanel.SetActive(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            if (_shopPanel != null) _shopPanel.style.display = DisplayStyle.None;
+            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+            UnityEngine.Cursor.visible = false;
         }
 
         private void UpgradeFermentation()
         {
-            if (playerGold >= fermentationUpgradeCost)
+            if (_playerGold >= fermentationUpgradeCost)
             {
-                playerGold -= fermentationUpgradeCost;
-                // Apply upgrade to player stats ScriptableObject (not implemented here yet)
+                _playerGold -= fermentationUpgradeCost;
                 Debug.Log("Upgraded Fermentation!");
                 UpdateUI();
             }
@@ -55,10 +59,9 @@ namespace Fireball.Core
 
         private void UpgradeArmor()
         {
-            if (playerGold >= armorUpgradeCost)
+            if (_playerGold >= armorUpgradeCost)
             {
-                playerGold -= armorUpgradeCost;
-                // Apply upgrade to player health
+                _playerGold -= armorUpgradeCost;
                 Debug.Log("Upgraded Armor!");
                 UpdateUI();
             }
@@ -66,12 +69,12 @@ namespace Fireball.Core
 
         private void UpdateUI()
         {
-            if (goldText != null) goldText.text = $"Gold: {playerGold}";
+            if (_goldLabel != null) _goldLabel.text = $"Gold: {_playerGold}";
         }
 
         public void AddGold(int amount)
         {
-            playerGold += amount;
+            _playerGold += amount;
             UpdateUI();
         }
     }

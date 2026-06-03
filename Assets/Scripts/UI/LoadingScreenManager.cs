@@ -1,17 +1,14 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
-using TMPro;
 using System.Collections;
 
 namespace Fireball.UI
 {
     public class LoadingScreenManager : MonoBehaviour
     {
-        [Header("UI Elements")]
-        [SerializeField] private Slider progressBar;
-        [SerializeField] private TextMeshProUGUI tipText;
-        [SerializeField] private Image background;
+        private ProgressBar _progressBar;
+        private Label _tipLabel;
 
         [Header("Settings")]
         [SerializeField] private string targetSceneName = "Level1";
@@ -25,8 +22,12 @@ namespace Fireball.UI
             "The Shop is your friend. Spend gold wisely."
         };
 
-        private void Start()
+        private void OnEnable()
         {
+            var root = GetComponent<UIDocument>().rootVisualElement;
+            _progressBar = root.Q<ProgressBar>("ProgressBar");
+            _tipLabel = root.Q<Label>("TipLabel");
+
             StartCoroutine(LoadSceneAsync());
             StartCoroutine(CycleTips());
         }
@@ -39,10 +40,9 @@ namespace Fireball.UI
 
             while (!operation.isDone)
             {
-                float progress = Mathf.Clamp01(operation.progress / 0.9f);
-                if (progressBar != null) progressBar.value = progress;
+                float progress = Mathf.Clamp01(operation.progress / 0.9f) * 100f; // UI Toolkit ProgressBar is usually 0-100
+                if (_progressBar != null) _progressBar.value = progress;
 
-                // Check if loading is complete and minimum time has passed
                 if (operation.progress >= 0.9f && (Time.time - startTime) >= minLoadingTime)
                 {
                     operation.allowSceneActivation = true;
@@ -54,11 +54,11 @@ namespace Fireball.UI
 
         private IEnumerator CycleTips()
         {
-            if (tipText == null || gameplayTips.Length == 0) yield break;
+            if (_tipLabel == null || gameplayTips.Length == 0) yield break;
 
             while (true)
             {
-                tipText.text = gameplayTips[Random.Range(0, gameplayTips.Length)];
+                _tipLabel.text = gameplayTips[Random.Range(0, gameplayTips.Length)];
                 yield return new WaitForSeconds(4f);
             }
         }

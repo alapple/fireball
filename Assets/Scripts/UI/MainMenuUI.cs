@@ -1,50 +1,61 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 
 namespace Fireball.UI
 {
     public class MainMenuUI : MonoBehaviour
     {
-        [Header("Main Buttons")]
-        [SerializeField] private Button playButton;
-        [SerializeField] private Button settingsButton;
-        [SerializeField] private Button quizButton;
+        private Button _playButton;
+        private Button _settingsButton;
+        private Button _quizButton;
 
-        [Header("Panels")]
-        [SerializeField] private GameObject settingsPanel;
-        [SerializeField] private GameObject quizPanel;
+        private VisualElement _settingsPanel;
+        private VisualElement _quizPanel;
 
         [Header("Scene Configuration")]
         [SerializeField] private string loadingSceneName = "LoadingScene";
 
-        private void Start()
+        private void OnEnable()
         {
-            if (playButton != null) playButton.onClick.AddListener(OnPlayClicked);
-            if (settingsButton != null) settingsButton.onClick.AddListener(ToggleSettings);
-            if (quizButton != null) quizButton.onClick.AddListener(ToggleQuiz);
+            var root = GetComponent<UIDocument>().rootVisualElement;
 
-            if (settingsPanel != null) settingsPanel.SetActive(false);
-            if (quizPanel != null) quizPanel.SetActive(false);
+            _playButton = root.Q<Button>("PlayButton");
+            _settingsButton = root.Q<Button>("SettingsButton");
+            _quizButton = root.Q<Button>("QuizButton");
+
+            _settingsPanel = root.Q<VisualElement>("SettingsPanel");
+            _quizPanel = root.Q<VisualElement>("QuizPanel");
+
+            if (_playButton != null) _playButton.clicked += OnPlayClicked;
+            if (_settingsButton != null) _settingsButton.clicked += ToggleSettings;
+            if (_quizButton != null) _quizButton.clicked += ToggleQuiz;
+
+            if (_settingsPanel != null) _settingsPanel.style.display = DisplayStyle.None;
+            if (_quizPanel != null) _quizPanel.style.display = DisplayStyle.None;
         }
 
         private void OnPlayClicked()
         {
-            // We'll pass the Level1 name to the LoadingScreenManager via a static or persistent object later.
-            // For now, let's just load the LoadingScene.
             SceneManager.LoadScene(loadingSceneName);
         }
 
         private void ToggleSettings()
         {
-            if (settingsPanel != null)
-                settingsPanel.SetActive(!settingsPanel.activeSelf);
+            if (_settingsPanel != null)
+            {
+                bool isVisible = _settingsPanel.style.display == DisplayStyle.Flex;
+                _settingsPanel.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex;
+            }
         }
 
         private void ToggleQuiz()
         {
-            if (quizPanel != null)
-                quizPanel.SetActive(!quizPanel.activeSelf);
+            if (_quizPanel != null)
+            {
+                bool isVisible = _quizPanel.style.display == DisplayStyle.Flex;
+                _quizPanel.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex;
+            }
         }
     }
 }

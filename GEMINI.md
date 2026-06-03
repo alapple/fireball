@@ -9,15 +9,15 @@ Create the following scenes and add them to the Build Settings:
 3. `Level1`
 
 ## 2. Main Menu Setup
-- Create a Canvas with three buttons: `PlayButton`, `SettingsButton`, `QuizButton`.
-- Create two Panels: `SettingsPanel`, `QuizPanel`.
-- Attach the `MainMenuUI` script to a manager object.
-- Drag the buttons and panels into the `MainMenuUI` fields.
+- Create a **UIDocument** with elements named: `PlayButton`, `SettingsButton`, `QuizButton`, `SettingsPanel`, `QuizPanel`.
+- Create a `MainMenu.uxml` file using UI Builder.
+- Attach the `MainMenuUI` script to the UIDocument object.
+- The script will automatically find elements by name.
 
 ## 3. Loading Scene Setup
-- Create a Canvas with a Slider (`ProgressBar`), TextMeshProUGUI (`TipText`), and Image (`Background`).
-- Attach the `LoadingScreenManager` script to a manager object.
-- Drag the UI elements into the fields. Set `Target Scene Name` to `Level1`.
+- Create a **UIDocument** with a `ProgressBar` (named `ProgressBar`) and a `Label` (named `TipLabel`).
+- Attach the `LoadingScreenManager` script to the UIDocument object.
+- Set `Target Scene Name` to `Level1`.
 
 ## 4. Player Setup (Level1)
 - Create a Player object with a `CharacterController`.
@@ -44,6 +44,6 @@ Create the following scenes and add them to the Build Settings:
 
 ## 7. Shop Setup
 - Create a trigger zone at the end of the level.
-- Create a Shop Canvas with `ShopPanel`, `GoldText`, and buttons for upgrades.
-- Attach `ShopManager` and link the UI elements.
+- Create a **UIDocument** for the Shop with: `ShopPanel`, `GoldLabel`, `FermentationButton`, `ArmorButton`.
+- Attach `ShopManager` and ensure it's on the same object as the UIDocument.
 - Trigger `OpenShop()` when the player enters the zone.
