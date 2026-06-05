@@ -18,7 +18,8 @@ namespace Fireball.Editor
 
         private void OnGUI()
         {
-            GUILayout.Label("Fireball Player Setup", EditorStyles.boldLabel);
+            GUILayout.Label("Fireball Player Setup (Finalized)", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("This will setup the Player with 3D models, Glossy Foam, and Camera-bound aiming.", MessageType.Info);
             
             if (GUILayout.Button("Create/Setup Player"))
             {
@@ -28,7 +29,7 @@ namespace Fireball.Editor
 
         private static void SetupPlayer()
         {
-            // 1. Create Player Root
+            // 1. Create/Find Player Root
             GameObject player = GameObject.FindWithTag("Player");
             if (player == null)
             {
@@ -36,13 +37,13 @@ namespace Fireball.Editor
                 player.tag = "Player";
             }
 
-            // 2. Add Components
-            CharacterController cc = GetOrAddComponent<CharacterController>(player);
+            // 2. Add Core Components
+            GetOrAddComponent<CharacterController>(player);
             PlayerInput input = GetOrAddComponent<PlayerInput>(player);
             PlayerController pc = GetOrAddComponent<PlayerController>(player);
             PlayerHealth health = GetOrAddComponent<PlayerHealth>(player);
 
-            // 3. Setup Camera
+            // 3. Setup Camera (Required for Aiming)
             Camera cam = player.GetComponentInChildren<Camera>();
             if (cam == null)
             {
@@ -53,12 +54,11 @@ namespace Fireball.Editor
                 camObj.AddComponent<AudioListener>();
             }
             
-            // Assign camera to controller
             var pcSerialized = new SerializedObject(pc);
             pcSerialized.FindProperty("cameraTransform").objectReferenceValue = cam.transform;
             pcSerialized.ApplyModifiedProperties();
 
-            // 4. Setup Input
+            // 4. Setup Input (Broadcast for weapons)
             InputActionAsset actions = AssetDatabase.LoadAssetAtPath<InputActionAsset>("Assets/InputSystem_Actions.inputactions");
             if (actions != null)
             {
@@ -67,7 +67,7 @@ namespace Fireball.Editor
                 input.notificationBehavior = PlayerNotifications.BroadcastMessages;
             }
 
-            // 5. Setup Health/Stats
+            // 5. Setup Health & Stats
             PlayerStats stats = AssetDatabase.LoadAssetAtPath<PlayerStats>("Assets/ScriptableObjects/PlayerStats.asset");
             if (stats != null)
             {
@@ -76,7 +76,7 @@ namespace Fireball.Editor
                 healthSerialized.ApplyModifiedProperties();
             }
 
-            // 6. Setup Weapons
+            // 6. Setup Weapon Manager (Parented to Camera for Vertical Aiming)
             GameObject weaponManagerObj = null;
             Transform wmTransform = cam.transform.Find("WeaponManager");
             if (wmTransform != null) weaponManagerObj = wmTransform.gameObject;
@@ -90,11 +90,11 @@ namespace Fireball.Editor
 
             WeaponDualWieldManager wdm = GetOrAddComponent<WeaponDualWieldManager>(weaponManagerObj);
             
-            // Setup Hands
+            // 7. Setup Hands (Left = Champagne, Right = Moonshine)
             SetupHand(weaponManagerObj.transform, "LeftHand", typeof(ChampagneFlamethrower), "Assets/ScriptableObjects/ChampaineData.asset", stats);
             SetupHand(weaponManagerObj.transform, "RightHand", typeof(MoonshineMolotov), "Assets/ScriptableObjects/MoonshineData.asset", stats);
 
-            // Link Weapons to Manager
+            // 8. Link Manager to Inventory
             List<BottleWeapon> weapons = new List<BottleWeapon>(weaponManagerObj.GetComponentsInChildren<BottleWeapon>(true));
             var wdmSerialized = new SerializedObject(wdm);
             var allWeaponsProp = wdmSerialized.FindProperty("allWeapons");
@@ -108,7 +108,7 @@ namespace Fireball.Editor
             wdmSerialized.ApplyModifiedProperties();
 
             Selection.activeGameObject = player;
-            Debug.Log("Player Setup Complete!");
+            Debug.Log("Player Setup Finalized with Glossy Mesh Foam!");
         }
 
         private static void SetupHand(Transform parent, string name, System.Type weaponType, string dataPath, PlayerStats stats)
@@ -121,7 +121,7 @@ namespace Fireball.Editor
                 hand.localPosition = (name == "LeftHand") ? new Vector3(-0.4f, -0.2f, 0.4f) : new Vector3(0.4f, -0.2f, 0.4f);
             }
 
-            // Add Visual Hand Placeholder
+            // Visual Hand Placeholder (Capsule)
             Transform handVisual = hand.Find("HandVisual");
             if (handVisual == null)
             {
@@ -135,22 +135,41 @@ namespace Fireball.Editor
                 DestroyImmediate(capsule.GetComponent<Collider>());
             }
 
-            // Add Bottle Model for Champagne
-            if (weaponType == typeof(ChampagneFlamethrower))
+            // 3D Model Setup
+            Transform bottleModel = hand.Find("BottleModel");
+            if (bottleModel == null)
             {
-                Transform bottleModel = hand.Find("BottleModel");
-                if (bottleModel == null)
+                string modelPath = (weaponType == typeof(ChampagneFlamethrower)) 
+                    ? "Assets/3d/Bottle of Champagne/Bottle_of_Champagne_01.obj" 
+                    : "Assets/3d/Molotov/Molotov.fbx";
+
+                GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+                if (modelPrefab != null)
                 {
-                    GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/3d/Bottle of Champagne/Bottle_of_Champagne_01.obj");
-                    if (modelPrefab != null)
+                    GameObject model = (GameObject)PrefabUtility.InstantiatePrefab(modelPrefab);
+                    model.name = "BottleModel";
+                    bottleModel = model.transform;
+                    bottleModel.SetParent(hand);
+                    
+                    if (weaponType == typeof(ChampagneFlamethrower))
                     {
-                        GameObject model = (GameObject)PrefabUtility.InstantiatePrefab(modelPrefab);
-                        model.name = "BottleModel";
-                        bottleModel = model.transform;
-                        bottleModel.SetParent(hand);
                         bottleModel.localPosition = new Vector3(0, 0.2f, 0.1f);
                         bottleModel.localRotation = Quaternion.Euler(-90, 0, 0);
                         bottleModel.localScale = Vector3.one * 0.5f;
+                    }
+                    else // Molotov
+                    {
+                        bottleModel.localPosition = new Vector3(0, 0.15f, 0.1f);
+                        bottleModel.localRotation = Quaternion.Euler(0, 0, 0);
+                        bottleModel.localScale = Vector3.one * 1.0f; // FBX might have different scale than OBJ
+                        
+                        // Apply Glossy Material to Molotov
+                        var renderer = model.GetComponentInChildren<MeshRenderer>();
+                        if (renderer != null)
+                        {
+                            Material glossMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Settings/ChampagneGlossy.mat");
+                            if (glossMat != null) renderer.material = glossMat;
+                        }
                     }
                 }
             }
@@ -161,97 +180,156 @@ namespace Fireball.Editor
             var weaponSerialized = new SerializedObject(weapon);
             weaponSerialized.FindProperty("weaponData").objectReferenceValue = data;
             weaponSerialized.FindProperty("playerStats").objectReferenceValue = stats;
-            
-            // Special setup for Champagne (Particle System)
+
+            // Champagne Specifics
             if (weaponType == typeof(ChampagneFlamethrower))
             {
-                ParticleSystem ps = hand.GetComponentInChildren<ParticleSystem>();
-                if (ps == null)
-                {
-                    GameObject psObj = new GameObject("FoamParticles");
-                    psObj.transform.SetParent(hand);
-                    psObj.transform.localPosition = Vector3.zero;
-                    psObj.transform.localRotation = Quaternion.identity;
-                    ps = psObj.AddComponent<ParticleSystem>();
-                    
-                    // Main Module
-                    var main = ps.main;
-                    main.duration = 1.0f;
-                    main.loop = true;
-                    main.startLifetime = new ParticleSystem.MinMaxCurve(0.4f, 0.7f);
-                    main.startSpeed = new ParticleSystem.MinMaxCurve(15f, 22f);
-                    main.startSize = new ParticleSystem.MinMaxCurve(0.05f, 0.2f); // Variety of bubble sizes
-                    main.gravityModifier = 0.8f; // More weight to the foam
-                    main.simulationSpace = ParticleSystemSimulationSpace.World;
-                    
-                    // Emission
-                    var emission = ps.emission;
-                    emission.rateOverTime = 150f; // Denser foam
-
-                    // Shape
-                    var shape = ps.shape;
-                    shape.shapeType = ParticleSystemShapeType.Cone;
-                    shape.angle = 2.5f; // Even tighter stream
-                    shape.radius = 0.02f;
-
-                    // Color over Lifetime (Pure White to Slight Yellow/Cream)
-                    var colorOverLifetime = ps.colorOverLifetime;
-                    colorOverLifetime.enabled = true;
-                    Gradient gradient = new Gradient();
-                    gradient.SetKeys(
-                        new GradientColorKey[] { 
-                            new GradientColorKey(Color.white, 0.0f), 
-                            new GradientColorKey(new Color(0.95f, 0.95f, 0.8f), 0.5f), // Creamy foam
-                            new GradientColorKey(Color.white, 1.0f) 
-                        },
-                        new GradientAlphaKey[] { 
-                            new GradientAlphaKey(1.0f, 0.0f), 
-                            new GradientAlphaKey(1.0f, 0.7f), 
-                            new GradientAlphaKey(0.0f, 1.0f) 
-                        }
-                    );
-                    colorOverLifetime.color = gradient;
-
-                    // Size over Lifetime (Blobs grow as they travel)
-                    var sizeOverLifetime = ps.sizeOverLifetime;
-                    sizeOverLifetime.enabled = true;
-                    AnimationCurve curve = new AnimationCurve();
-                    curve.AddKey(0.0f, 0.1f);
-                    curve.AddKey(0.2f, 0.8f);
-                    curve.AddKey(1.0f, 1.2f);
-                    sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1.0f, curve);
-
-                    // Rotation over Lifetime (Bubbles spin)
-                    var rot = ps.rotationOverLifetime;
-                    rot.enabled = true;
-                    rot.z = new ParticleSystem.MinMaxCurve(-180, 180);
-
-                    // Renderer: MESH MODE for Low Poly look
-                    var renderer = ps.GetComponent<ParticleSystemRenderer>();
-                    renderer.renderMode = ParticleSystemRenderMode.Mesh;
-                    renderer.mesh = AssetDatabase.GetBuiltinExtraResource<Mesh>("Sphere.fbx");
-                    renderer.material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Material.mat"); // Opaque white
-                    renderer.minParticleSize = 0.001f;
-                    renderer.maxParticleSize = 1.0f;
-                }
-                weaponSerialized.FindProperty("foamParticles").objectReferenceValue = ps;
-                weaponSerialized.FindProperty("hitLayers").intValue = -1; // Everything
+                SetupChampagneVFX(hand, weaponSerialized);
             }
 
-            // Special setup for Moonshine (Fire Point)
+            // Moonshine Specifics
             if (weaponType == typeof(MoonshineMolotov))
             {
-                Transform firePoint = hand.Find("FirePoint");
-                if (firePoint == null)
-                {
-                    firePoint = new GameObject("FirePoint").transform;
-                    firePoint.SetParent(hand);
-                    firePoint.localPosition = Vector3.forward * 0.2f;
-                }
-                weaponSerialized.FindProperty("firePoint").objectReferenceValue = firePoint;
+                SetupMoonshineVisuals(hand, weaponSerialized);
             }
 
             weaponSerialized.ApplyModifiedProperties();
+        }
+
+        private static void SetupMoonshineVisuals(Transform hand, SerializedObject weaponSerialized)
+        {
+            // Fire Point (at the neck)
+            Transform firePoint = hand.Find("FirePoint");
+            if (firePoint != null) 
+            {
+                Debug.Log("Skipping Moonshine FirePoint setup: already exists.");
+                return; 
+            }
+
+            firePoint = new GameObject("FirePoint").transform;
+            firePoint.SetParent(hand);
+            firePoint.localPosition = new Vector3(0, 0.45f, 0.1f);
+            weaponSerialized.FindProperty("firePoint").objectReferenceValue = firePoint;
+
+            // Lit Wick Effect
+            GameObject wickObj = new GameObject("LitWick");
+            wickObj.transform.SetParent(firePoint);
+            wickObj.transform.localPosition = Vector3.zero;
+            ParticleSystem ps = wickObj.AddComponent<ParticleSystem>();
+            
+            var main = ps.main;
+            main.startLifetime = 0.5f;
+            main.startSpeed = 0.5f;
+            main.startSize = 0.2f;
+            main.gravityModifier = -0.2f;
+            
+            var emission = ps.emission;
+            emission.rateOverTime = 15f;
+
+            var colorOverLifetime = ps.colorOverLifetime;
+            colorOverLifetime.enabled = true;
+            Gradient grad = new Gradient();
+            grad.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(Color.yellow, 0f), new GradientColorKey(Color.red, 1f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) }
+            );
+            colorOverLifetime.color = grad;
+
+            var renderer = ps.GetComponent<ParticleSystemRenderer>();
+            renderer.material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Particle.mat");
+        }
+
+        private static void SetupChampagneVFX(Transform hand, SerializedObject weaponSerialized)
+        {
+            ParticleSystem ps = hand.GetComponentInChildren<ParticleSystem>();
+            if (ps != null)
+            {
+                Debug.Log("Skipping Champagne VFX setup: ParticleSystem already exists. Keeping your manual changes!");
+                return;
+            }
+
+            GameObject psObj = new GameObject("FoamParticles");
+            psObj.transform.SetParent(hand);
+            psObj.transform.localPosition = Vector3.zero;
+            psObj.transform.localRotation = Quaternion.identity;
+            ps = psObj.AddComponent<ParticleSystem>();
+
+            var main = ps.main;
+            main.duration = 1.0f;
+            main.loop = true;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.4f, 0.7f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(15f, 22f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.05f, 0.2f);
+            main.gravityModifier = 0.8f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            
+            var emission = ps.emission;
+            emission.rateOverTime = 150f;
+
+            var shape = ps.shape;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = 2.5f;
+            shape.radius = 0.02f;
+
+            var colorOverLifetime = ps.colorOverLifetime;
+            colorOverLifetime.enabled = true;
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[] { 
+                    new GradientColorKey(Color.white, 0.0f), 
+                    new GradientColorKey(new Color(0.95f, 0.95f, 0.8f), 0.5f), 
+                    new GradientColorKey(Color.white, 1.0f) 
+                },
+                new GradientAlphaKey[] { 
+                    new GradientAlphaKey(1.0f, 0.0f), 
+                    new GradientAlphaKey(1.0f, 0.7f), 
+                    new GradientAlphaKey(0.0f, 1.0f) 
+                }
+            );
+            colorOverLifetime.color = gradient;
+
+            var sizeOverLifetime = ps.sizeOverLifetime;
+            sizeOverLifetime.enabled = true;
+            AnimationCurve curve = new AnimationCurve();
+            curve.AddKey(0.0f, 0.1f);
+            curve.AddKey(0.2f, 0.8f);
+            curve.AddKey(1.0f, 1.2f);
+            sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1.0f, curve);
+
+            var rot = ps.rotationOverLifetime;
+            rot.enabled = true;
+            rot.z = new ParticleSystem.MinMaxCurve(-180, 180);
+
+            var renderer = ps.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Mesh;
+            renderer.mesh = AssetDatabase.GetBuiltinExtraResource<Mesh>("Sphere.fbx");
+            
+            // Material Creation
+            string matPath = "Assets/Settings/ChampagneGlossy.mat";
+            Material glossMat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+            if (glossMat == null)
+            {
+                Shader litShader = Shader.Find("Universal Render Pipeline/Lit");
+                if (litShader == null) litShader = Shader.Find("Standard");
+                glossMat = new Material(litShader);
+                glossMat.color = new Color(1f, 1f, 0.95f);
+                if (litShader.name.Contains("Universal"))
+                {
+                    glossMat.SetFloat("_Smoothness", 0.95f);
+                    glossMat.SetFloat("_Metallic", 0.0f);
+                }
+                else
+                {
+                    glossMat.SetFloat("_Glossiness", 0.95f);
+                }
+                AssetDatabase.CreateAsset(glossMat, matPath);
+            }
+            renderer.material = glossMat;
+            renderer.minParticleSize = 0.001f;
+            renderer.maxParticleSize = 1.0f;
+
+            weaponSerialized.FindProperty("foamParticles").objectReferenceValue = ps;
+            weaponSerialized.FindProperty("hitLayers").intValue = -1; // Everything
         }
 
         private static T GetOrAddComponent<T>(GameObject obj) where T : Component
