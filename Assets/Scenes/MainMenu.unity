@@ -279,11 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a605b7f095bc2597a4cf8f4a5f1768f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Fireball.UI.MainMenuUI
-  playButton: {fileID: 0}
-  settingsButton: {fileID: 0}
-  quizButton: {fileID: 0}
-  settingsPanel: {fileID: 0}
-  quizPanel: {fileID: 0}
+  playerStats: {fileID: 11400000, guid: c5586f6a1f50bc03e85baa853bf67c95, type: 2}
   loadingSceneName: LoadingScene
 --- !u!1 &1596343038
 GameObject:

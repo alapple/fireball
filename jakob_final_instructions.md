@@ -15,7 +15,7 @@ I have implemented the core logic for the stat system, shop, and HUD. Here is wh
 
 ## 3. Setup the HUD
 1. In `Level1`, create a new **UIDocument** object.
-2. Assign `Assets/Scripts/UI/PlayerHUD.uxml` to the **Visual Tree Asset** field.
+2. Assign `Assets/Scripts/UI/PlayerHUD.uxml` to the **Visual Tree Asset** field. ?
 3. Attach the `PlayerHUD` script to this object.
 4. Assign the `PlayerStats` asset to the **Player Stats** field of the `PlayerHUD` script.
 
