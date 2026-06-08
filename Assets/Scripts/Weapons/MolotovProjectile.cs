@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 namespace Fireball.Weapons
 {
@@ -6,6 +7,24 @@ namespace Fireball.Weapons
     {
         [SerializeField] private GameObject fireZonePrefab;
         [SerializeField] private GameObject explosionEffect;
+        
+        private Collider col;
+
+        private void Awake()
+        {
+            col = GetComponent<Collider>();
+            if (col != null)
+            {
+                col.enabled = false;
+                StartCoroutine(EnableColliderAfterDelay(0.1f));
+            }
+        }
+
+        private IEnumerator EnableColliderAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (col != null) col.enabled = true;
+        }
 
         private void OnCollisionEnter(Collision collision)
         {

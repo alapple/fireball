@@ -14,7 +14,16 @@ namespace Fireball.Weapons
 
             currentAmmo -= 20f; // High cost per throw
 
-            GameObject projectile = Instantiate(weaponData.projectilePrefab, firePoint.position, firePoint.rotation);
+            GameObject projectile = Instantiate(weaponData.projectilePrefab, firePoint.position + firePoint.forward * 0.5f, firePoint.rotation);
+            Collider projectileCollider = projectile.GetComponent<Collider>();
+            if (projectileCollider != null)
+            {
+                Collider[] playerColliders = transform.root.GetComponentsInChildren<Collider>();
+                foreach (Collider playerCollider in playerColliders)
+                {
+                    Physics.IgnoreCollision(projectileCollider, playerCollider);
+                }
+            }
             if (projectile.TryGetComponent(out Rigidbody rb))
             {
                 rb.AddForce(firePoint.forward * throwForce, ForceMode.Impulse);
