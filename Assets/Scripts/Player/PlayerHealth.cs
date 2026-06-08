@@ -57,7 +57,6 @@ namespace Fireball.Player
 
         private void Die()
         {
-            Debug.Log("Player Died!");
             // Handle death (reload scene or game over UI)
             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
         }

@@ -45,8 +45,13 @@ namespace Fireball.Weapons
             RaycastHit[] hits = Physics.SphereCastAll(transform.position, radius, transform.forward, range, hitLayers);
             foreach (var hit in hits)
             {
+                if (hit.collider.CompareTag("Player")) continue; // Don't damage player
+
+                Debug.Log($"Weapon hit: {hit.collider.name}");
+
                 if (hit.collider.TryGetComponent(out IDamageable damageable))
                 {
+                    Debug.Log($"Applying damage to: {hit.collider.name}");
                     damageable.TakeDamage(weaponData.damage * Time.deltaTime * 10f); // Scale damage
                 }
 

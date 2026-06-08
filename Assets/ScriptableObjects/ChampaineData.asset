@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 585327373bdabce75a827be174cbe6ac, type: 3}
   m_Name: ChampaineData
   m_EditorClassIdentifier: Assembly-CSharp::Fireball.ScriptableObjects.WeaponData
-  weaponName: 
+  weaponName: Champain
   maxAmmo: 100
   fermentationRate: 10
   fireRate: 0.1
-  damage: 5
+  damage: 50
   knockbackForce: 10
   projectilePrefab: {fileID: 0}

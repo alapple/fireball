@@ -43,6 +43,22 @@ namespace Fireball.Enemies
             AISquadManager.Instance?.UnregisterEnemy(this);
         }
 
+        public void Configure(float health, float speed, float range, float cooldown, float damage, int gold)
+        {
+            maxHealth = health;
+            currentHealth = maxHealth;
+            moveSpeed = speed;
+            attackRange = range;
+            attackCooldown = cooldown;
+            this.damage = damage;
+            goldValue = gold;
+
+            if (agent != null)
+            {
+                agent.speed = moveSpeed;
+            }
+        }
+
         public void AssignRole(SquadRole role, Vector3 pos)
         {
             currentRole = role;
@@ -66,6 +82,7 @@ namespace Fireball.Enemies
 
         public virtual void TakeDamage(float amount)
         {
+            Debug.Log($"{name} received {amount} damage. Current health: {currentHealth - amount}");
             currentHealth -= amount;
             if (currentHealth <= 0)
             {
@@ -73,17 +90,17 @@ namespace Fireball.Enemies
             }
         }
 
+        protected System.Action<EnemyBase> onDeathCallback;
+
+        public void SetDeathCallback(System.Action<EnemyBase> callback)
+        {
+            onDeathCallback = callback;
+        }
+
         protected virtual void Die()
         {
-            if (player != null && player.TryGetComponent(out Fireball.Player.PlayerHealth playerHealth))
-            {
-                // Access stats through player health
-                // We'll assume the player has a way to get gold added
-                // For simplicity, let's find the ShopManager if it exists or just add to the ScriptableObject directly if we can find it.
-                // Better: Let's assume the ScriptableObject is a singleton-like asset or we find it.
-                // For now, let's just use the direct addition if we can get a reference.
-            }
-            
+            onDeathCallback?.Invoke(this);
+
             // Actually, let's use a simpler approach: Find any ShopManager and add gold there.
             ShopManager shop = FindObjectOfType<ShopManager>();
             if (shop != null)
