@@ -5277,12 +5277,13 @@ GameObject:
   - component: {fileID: 867025988}
   - component: {fileID: 867025987}
   - component: {fileID: 867025986}
+  - component: {fileID: 867025990}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &867025986
 BoxCollider:
@@ -5372,11 +5373,43 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.22208, y: 0, z: 0.45}
-  m_LocalScale: {x: 17.80307, y: 1.0265, z: 15.522774}
+  m_LocalScale: {x: 1000, y: 1.0265, z: 1000}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &867025990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 867025985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 6.26
+  m_NavMeshData: {fileID: 23800000, guid: 519fc307cfb0f9144941090997f4718f, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &888461145
 GameObject:
   m_ObjectHideFlags: 0
@@ -5461,7 +5494,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
-  m_DefaultActionMap: 
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!143 &888461149
@@ -5485,7 +5518,7 @@ CharacterController:
   m_Height: 2
   m_Radius: 0.5
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.4
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
@@ -11056,6 +11089,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2138644630}
   - component: {fileID: 2138644629}
+  - component: {fileID: 2138644631}
   m_Layer: 0
   m_Name: SquadManager
   m_TagString: Untagged
@@ -11075,7 +11109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d582eb8fe2083a9c2b77428ab0d5177f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Fireball.Enemies.AISquadManager
-  updateInterval: 2
+  updateInterval: 0.5
   shieldWallSpacing: 1.5
   flankAngle: 120
 --- !u!4 &2138644630
@@ -11093,6 +11127,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2138644631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138644628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b0a4709cc4be554589e3c4b3cae8439, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Fireball.Enemies.InfiniteSpawner
+  enemyPrefabs:
+  - {fileID: 3555694079097409517, guid: 5247f563ab900f0ca80776c37a86cb53, type: 3}
+  - {fileID: 3199770891393245098, guid: 9f5f3469b6b69b03693666e68e5c98e0, type: 3}
+  minSpawnRadius: 15
+  maxSpawnRadius: 30
+  spawnInterval: 3
+  maxActiveEnemies: 20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

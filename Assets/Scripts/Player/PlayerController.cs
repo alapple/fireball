@@ -32,9 +32,20 @@ namespace Fireball.Player
             Cursor.lockState = CursorLockMode.Locked;
         }
 
-        public void OnMove(InputValue value) => moveInput = value.Get<Vector2>();
-        public void OnLook(InputValue value) => lookInput = value.Get<Vector2>();
-        public void OnSprint(InputValue value) => sprintHeld = value.isPressed;
+        public void OnMove(InputValue value) 
+        {
+            moveInput = value.Get<Vector2>();
+        }
+
+        public void OnLook(InputValue value)
+        {
+            lookInput = value.Get<Vector2>();
+        }
+
+        public void OnSprint(InputValue value) 
+        {
+            sprintHeld = value.isPressed;
+        }
 
         public void SetForcedSprint(bool forced) => isForcedSprint = forced;
 
@@ -42,12 +53,19 @@ namespace Fireball.Player
         {
             HandleRotation();
             HandleMovement();
+
+            // Explicitly clear lookInput delta after processing to prevent spinning
+            // but keep moveInput as it is a continuous state
+            lookInput = Vector2.zero; 
         }
 
         private void HandleRotation()
         {
-            float mouseX = lookInput.x * mouseSensitivity;
-            float mouseY = lookInput.y * mouseSensitivity;
+            // Direct polling of mouse delta for stability
+            Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+            
+            float mouseX = mouseDelta.x * mouseSensitivity;
+            float mouseY = mouseDelta.y * mouseSensitivity;
 
             xRotation -= mouseY;
             xRotation = Mathf.Clamp(xRotation, -90f, 90f);
@@ -58,6 +76,16 @@ namespace Fireball.Player
 
         private void HandleMovement()
         {
+            // Direct polling of move input instead of waiting for events
+            Vector2 input = Vector2.zero;
+            if (Keyboard.current.wKey.isPressed) input.y += 1;
+            if (Keyboard.current.sKey.isPressed) input.y -= 1;
+            if (Keyboard.current.aKey.isPressed) input.x -= 1;
+            if (Keyboard.current.dKey.isPressed) input.x += 1;
+            
+            moveInput = input.normalized;
+            sprintHeld = Keyboard.current.leftShiftKey.isPressed;
+
             isGrounded = controller.isGrounded;
             if (isGrounded && velocity.y < 0)
             {
@@ -65,11 +93,19 @@ namespace Fireball.Player
             }
 
             float currentSpeed = (sprintHeld || isForcedSprint) ? sprintSpeed : walkSpeed;
+            
+            // Calculate move direction
             Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
-            controller.Move(move * currentSpeed * Time.deltaTime);
+            
+            // Combine horizontal movement and vertical velocity into one vector
+            Vector3 finalVelocity = move * currentSpeed;
+            finalVelocity.y = velocity.y;
 
+            // Apply gravity
             velocity.y += gravity * Time.deltaTime;
-            controller.Move(velocity * Time.deltaTime);
+
+            // SINGLE Move call
+            controller.Move(finalVelocity * Time.deltaTime);
         }
 
         public void OnJump()

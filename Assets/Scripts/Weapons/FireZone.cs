@@ -19,7 +19,8 @@ namespace Fireball.Weapons
             Collider[] colliders = Physics.OverlapSphere(transform.position, radius);
             foreach (var col in colliders)
             {
-                if (col.TryGetComponent(out IDamageable damageable))
+                // Only damage if it's NOT the player
+                if (!col.CompareTag("Player") && col.TryGetComponent(out IDamageable damageable))
                 {
                     damageable.TakeDamage(damagePerSecond * Time.deltaTime);
                 }

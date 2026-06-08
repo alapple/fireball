@@ -11,54 +11,61 @@ namespace Fireball.Weapons
         [SerializeField] private float radius = 1.5f;
         [SerializeField] private LayerMask hitLayers;
 
-        public override void StartFire()
-        {
-            base.StartFire();
-            if (currentAmmo > 0 && foamParticles != null)
-            {
-                foamParticles.Play();
-            }
-        }
-
-        public override void StopFire()
-        {
-            base.StopFire();
-            if (foamParticles != null)
-            {
-                foamParticles.Stop();
-            }
-        }
-
         protected override void Update()
         {
+            // Call base.Update to ensure fermentation (ammo recharge) logic runs!
             base.Update();
-            if (isFiring && currentAmmo <= 0 && foamParticles != null)
+            
+            if (isFiring && currentAmmo > 0)
             {
-                foamParticles.Stop();
+                if (foamParticles != null && !foamParticles.isPlaying)
+                {
+                    foamParticles.Play();
+                }
+                ApplyFoamDamage();
+            }
+            else
+            {
+                if (foamParticles != null && foamParticles.isPlaying)
+                {
+                    foamParticles.Stop();
+                }
+            }
+        }
+
+        private void ApplyFoamDamage()
+        {
+            RaycastHit[] hits = Physics.SphereCastAll(transform.position, radius, transform.forward, range, hitLayers);
+            foreach (var hit in hits)
+            {
+                if (hit.collider.CompareTag("Player")) continue;
+
+                if (hit.collider.TryGetComponent(out IDamageable damageable))
+                {
+                    damageable.TakeDamage(weaponData.damage * Time.deltaTime);
+                }
+
+                if (hit.collider.TryGetComponent(out Rigidbody rb))
+                {
+                    rb.AddForce(transform.forward * weaponData.knockbackForce * Time.deltaTime, ForceMode.Acceleration);
+                }
             }
         }
 
         protected override void Fire()
         {
-            currentAmmo -= 1f; // Consumes ammo per "shot" in the continuous stream
+            // Continuous ammo consumption based on fire rate
+            float consumptionRate = weaponData.fireRate > 0 ? (1f / weaponData.fireRate) : 10f;
+            currentAmmo -= consumptionRate * Time.deltaTime;
+        }
 
-            RaycastHit[] hits = Physics.SphereCastAll(transform.position, radius, transform.forward, range, hitLayers);
-            foreach (var hit in hits)
+        protected override void AttemptFire()
+        {
+            // If we are firing, just call Fire to consume ammo. 
+            // The actual effect is in Update.
+            if (isFiring && currentAmmo > 0)
             {
-                if (hit.collider.CompareTag("Player")) continue; // Don't damage player
-
-                Debug.Log($"Weapon hit: {hit.collider.name}");
-
-                if (hit.collider.TryGetComponent(out IDamageable damageable))
-                {
-                    Debug.Log($"Applying damage to: {hit.collider.name}");
-                    damageable.TakeDamage(weaponData.damage * Time.deltaTime * 10f); // Scale damage
-                }
-
-                if (hit.collider.TryGetComponent(out Rigidbody rb))
-                {
-                    rb.AddForce(transform.forward * weaponData.knockbackForce, ForceMode.Impulse);
-                }
+                Fire();
             }
         }
     }

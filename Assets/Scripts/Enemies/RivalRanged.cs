@@ -15,6 +15,8 @@ namespace Fireball.Enemies
 
         protected override void HandleBehavior(float distanceToPlayer)
         {
+            if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
+
             if (currentRole == SquadRole.Strafe)
             {
                 ExecuteStrafe();
@@ -46,6 +48,8 @@ namespace Fireball.Enemies
 
         private void ExecuteStrafe()
         {
+            if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
+
             if (Time.time >= nextStrafeTime)
             {
                 strafeDir = Random.value > 0.5f ? transform.right : -transform.right;

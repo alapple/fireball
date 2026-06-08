@@ -28,6 +28,8 @@ namespace Fireball.Enemies
 
         private void ExecuteSquadTactic()
         {
+            if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
+
             switch (currentRole)
             {
                 case SquadRole.ShieldWall:

@@ -49,6 +49,7 @@ namespace Fireball.Weapons
         private void Update()
         {
             CheckAmmoStatus();
+            HandleContinuousInput();
         }
 
         private void CheckAmmoStatus()
@@ -62,20 +63,26 @@ namespace Fireball.Weapons
             }
         }
 
-        // Input Handlers
-        public void OnAttack(InputValue value)
+        private void HandleContinuousInput()
         {
-            if (leftHandWeapon == null) return;
-            if (value.isPressed) leftHandWeapon.StartFire();
-            else leftHandWeapon.StopFire();
+            // Direct polling of mouse buttons to prevent stuttering from the event system
+            if (leftHandWeapon != null)
+            {
+                if (Mouse.current.leftButton.isPressed) leftHandWeapon.StartFire();
+                else leftHandWeapon.StopFire();
+            }
+
+            if (rightHandWeapon != null)
+            {
+                if (Mouse.current.rightButton.isPressed) rightHandWeapon.StartFire();
+                else rightHandWeapon.StopFire();
+            }
         }
 
-        public void OnAttackSecondary(InputValue value)
-        {
-            if (rightHandWeapon == null) return;
-            if (value.isPressed) rightHandWeapon.StartFire();
-            else rightHandWeapon.StopFire();
-        }
+        // Input Handlers (Keep these for other inputs like cycling)
+        public void OnAttack(InputValue value) { /* Handled in Update now */ }
+        public void OnAttackSecondary(InputValue value) { /* Handled in Update now */ }
+
 
         public void OnNext(InputValue value)
         {

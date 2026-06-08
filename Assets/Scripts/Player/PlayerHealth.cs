@@ -39,6 +39,11 @@ namespace Fireball.Player
             float reduction = Mathf.Min(playerStats.armorLevel * 0.1f, 0.5f);
             float finalDamage = amount * (1f - reduction);
 
+            if (reduction > 0)
+            {
+                Debug.Log($"Armor reduced damage from {amount:F1} to {finalDamage:F1} (Reduction: {reduction * 100:F0}%)");
+            }
+
             playerStats.currentHealth -= finalDamage;
             if (playerStats.currentHealth <= 0)
             {
