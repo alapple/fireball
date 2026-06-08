@@ -5252,14 +5252,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 732191675}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0032484923, y: 0.22624199, z: -0.042071328}
+  m_LocalRotation: {x: -0, y: 0.86030614, z: -0, w: 0.5097777}
+  m_LocalPosition: {x: -0.064898364, y: 0.22624199, z: -0.034419265}
   m_LocalScale: {x: 0.48077077, y: 0.47133747, z: 0.48077077}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1761081710}
   m_Father: {fileID: 1097883708}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 118.702, z: 0}
 --- !u!4 &832932771 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2531606210752b54ea29d4887d06b168, type: 3}
@@ -5847,8 +5847,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8708f46d98ea15e138efda691e911011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Fireball.Weapons.WeaponDualWieldManager
-  leftHandWeapon: {fileID: 0}
-  rightHandWeapon: {fileID: 0}
+  leftHandWeapon: {fileID: 1090779737}
+  rightHandWeapon: {fileID: 1240195668}
   allWeapons:
   - {fileID: 1090779737}
   - {fileID: 1240195668}
