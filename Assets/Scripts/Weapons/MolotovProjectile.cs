@@ -36,7 +36,7 @@ namespace Fireball.Weapons
             if (fireZonePrefab != null)
             {
                 // Spawn fire zone slightly above impact point
-                Instantiate(fireZonePrefab, transform.position + Vector3.up * 0.1f, Quaternion.identity);
+                Instantiate(fireZonePrefab, transform.position + Vector3.up * 0.1f, Quaternion.Euler(90f, 0f, 0f));
             }
 
             if (explosionEffect != null)
