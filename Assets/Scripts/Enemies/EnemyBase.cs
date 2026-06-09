@@ -17,6 +17,7 @@ namespace Fireball.Enemies
 
         protected float currentHealth;
         protected NavMeshAgent agent;
+        protected Animator animator;
         protected Transform player;
         protected float lastAttackTime;
 
@@ -29,12 +30,24 @@ namespace Fireball.Enemies
         protected virtual void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
-            agent.speed = moveSpeed;
-            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+            animator = GetComponentInChildren<Animator>(); // Characters often have animator on a child model
+            if (animator == null) animator = GetComponent<Animator>();
+
+            if (agent != null)
+            {
+                agent.speed = moveSpeed;
+                agent.isStopped = false;
+            }
+            
+            FindPlayer();
         }
 
         protected virtual void OnEnable()
         {
+            if (AISquadManager.Instance == null)
+            {
+                Debug.LogWarning($"{name} enabled but AISquadManager.Instance is null.");
+            }
             AISquadManager.Instance?.RegisterEnemy(this);
         }
 
@@ -72,17 +85,50 @@ namespace Fireball.Enemies
 
         protected virtual void Update()
         {
-            if (player == null) return;
+            if (player == null)
+            {
+                FindPlayer();
+                if (player == null) return;
+            }
 
             float distance = Vector3.Distance(transform.position, player.position);
-            HandleBehavior(distance);
+
+            // NAVMESH FALLBACK SYSTEM
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                HandleBehavior(distance);
+            }
+            else
+            {
+                // Simple 'Slide towards player' fallback so the game doesn't break without NavMesh
+                if (distance > attackRange)
+                {
+                    Vector3 moveDir = (player.position - transform.position).normalized;
+                    moveDir.y = 0;
+                    transform.position += moveDir * moveSpeed * Time.deltaTime;
+                    
+                    if (moveDir != Vector3.zero)
+                        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDir), Time.deltaTime * 10f);
+                    
+                    if (animator != null) animator.SetFloat("Speed", moveSpeed);
+                }
+                else
+                {
+                    if (animator != null) animator.SetFloat("Speed", 0);
+                    HandleBehavior(distance); // Still allow attack logic
+                }
+            }
+        }
+
+        private void FindPlayer()
+        {
+            player = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
 
         protected abstract void HandleBehavior(float distanceToPlayer);
 
         public virtual void TakeDamage(float amount)
         {
-            Debug.Log($"{name} received {amount} damage. Current health: {currentHealth - amount}");
             currentHealth -= amount;
             if (currentHealth <= 0)
             {
@@ -100,15 +146,17 @@ namespace Fireball.Enemies
         protected virtual void Die()
         {
             onDeathCallback?.Invoke(this);
-
-            // Actually, let's use a simpler approach: Find any ShopManager and add gold there.
             ShopManager shop = FindObjectOfType<ShopManager>();
-            if (shop != null)
-            {
-                shop.AddGold(goldValue);
-            }
-
+            if (shop != null) shop.AddGold(goldValue);
             Destroy(gameObject);
+        }
+
+        protected virtual void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, attackRange);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawRay(transform.position, transform.forward * attackRange);
         }
     }
 }

@@ -40,6 +40,12 @@ namespace Fireball.Enemies
 
         private void Update()
         {
+            if (player == null)
+            {
+                player = GameObject.FindGameObjectWithTag("Player")?.transform;
+                if (player == null) return;
+            }
+
             if (Time.time >= nextUpdateTime)
             {
                 AssignTactics();
@@ -53,6 +59,8 @@ namespace Fireball.Enemies
 
             var meleeEnemies = activeEnemies.OfType<RivalMelee>().ToList();
             var rangedEnemies = activeEnemies.OfType<RivalRanged>().ToList();
+
+            if (meleeEnemies.Count == 0 && rangedEnemies.Count == 0) return;
 
             // Coordinate Melee: 2-3 form a shield wall, others flank
             int shieldWallCount = Mathf.Min(meleeEnemies.Count, 3);
@@ -81,6 +89,8 @@ namespace Fireball.Enemies
         private Vector3 CalculateShieldWallPos(int index, int total)
         {
             Vector3 dirToPlayer = (player.position - transform.position).normalized;
+            if (dirToPlayer == Vector3.zero) dirToPlayer = Vector3.forward;
+
             Vector3 right = Vector3.Cross(Vector3.up, dirToPlayer);
             
             float offset = (index - (total - 1) / 2f) * shieldWallSpacing;
@@ -89,6 +99,8 @@ namespace Fireball.Enemies
 
         private Vector3 CalculateFlankPos(int index)
         {
+            if (player == null) return transform.position;
+
             float angle = (index % 2 == 0 ? flankAngle : -flankAngle) * Mathf.Deg2Rad;
             Vector3 offset = new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle)) * 6f;
             return player.position + offset;

@@ -44,7 +44,7 @@ namespace Fireball.Editor
             // Set default stats
             spawnerSerialized.FindProperty("maxHealth").floatValue = 50f;
             spawnerSerialized.FindProperty("moveSpeed").floatValue = 3.5f;
-            spawnerSerialized.FindProperty("attackRange").floatValue = 2f;
+            spawnerSerialized.FindProperty("attackRange").floatValue = 1.5f;
             spawnerSerialized.FindProperty("attackCooldown").floatValue = 1.5f;
             spawnerSerialized.FindProperty("damage").floatValue = 10f;
             spawnerSerialized.FindProperty("goldValue").intValue = 10;
