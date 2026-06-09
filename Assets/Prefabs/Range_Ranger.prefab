@@ -1426,7 +1426,7 @@ MonoBehaviour:
   attackCooldown: 1.5
   damage: 10
   goldValue: 10
-  projectilePrefab: {fileID: 919132149155446097, guid: f7e9e4c2660dad26e879871e50e1b28e, type: 3}
+  projectilePrefab: {fileID: 4015243538068015274, guid: 93b4abe89a44ad808a5c5b12fd2feeea, type: 3}
   firePoint: {fileID: 349247059507441617}
   rotationOffset: {x: -90, y: 0, z: 0}
   preferredDistance: 8

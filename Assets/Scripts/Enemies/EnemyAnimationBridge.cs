@@ -11,16 +11,16 @@ namespace Fireball.Enemies
         private RivalMelee meleeAI;
         private RivalRanged rangedAI;
 
-        private void Awake()
+        private void FindAI()
         {
-            // Look for AI scripts on this object or any parent
-            meleeAI = GetComponentInParent<RivalMelee>();
-            rangedAI = GetComponentInParent<RivalRanged>();
+            if (meleeAI == null) meleeAI = GetComponentInParent<RivalMelee>();
+            if (rangedAI == null) rangedAI = GetComponentInParent<RivalRanged>();
         }
 
         // REDIRECT MELEE EVENT
         public void PerformDamage()
         {
+            FindAI();
             if (meleeAI != null) meleeAI.PerformDamage();
             else if (rangedAI != null) Debug.LogWarning("PerformDamage called on a Ranged enemy. Check your animation events!");
         }
@@ -28,6 +28,7 @@ namespace Fireball.Enemies
         // REDIRECT RANGED EVENT
         public void PerformShoot()
         {
+            FindAI();
             if (rangedAI != null) rangedAI.PerformShoot();
             else if (meleeAI != null) Debug.LogWarning("PerformShoot called on a Melee enemy. Check your animation events!");
         }

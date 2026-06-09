@@ -5931,61 +5931,6 @@ MonoBehaviour:
   - {fileID: 1090779737}
   - {fileID: 1240195668}
   playerController: {fileID: 888461147}
---- !u!1 &1492775754
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1492775756}
-  - component: {fileID: 1492775755}
-  m_Layer: 0
-  m_Name: EnemySpawner_Range_Ranger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1492775755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1492775754}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c8f2386c9e45a68f9f2c3b59eb85d29, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Fireball.Enemies.EnemySpawner
-  enemyPrefab: {fileID: 5313649456205464426, guid: 54c91b3a2ab43afccb440a551f0ad7f6, type: 3}
-  enemyType: 0
-  maxHealth: 50
-  moveSpeed: 3.5
-  attackRange: 5
-  attackCooldown: 1.5
-  damage: 10
-  goldValue: 10
-  spawnInterval: 5
-  maxActiveSpawns: 1
-  maxTotalSpawns: 20
---- !u!4 &1492775756
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1492775754}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.4, y: 0, z: -7.13}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1534106592
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11048,7 +10993,7 @@ MonoBehaviour:
   damage: 10
   goldValue: 10
   spawnInterval: 5
-  maxActiveSpawns: 0
+  maxActiveSpawns: 5
   maxTotalSpawns: 20
 --- !u!4 &1772723971
 Transform:
@@ -11060,6 +11005,61 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 2.5, z: -3.19}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1909071652
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1909071654}
+  - component: {fileID: 1909071653}
+  m_Layer: 0
+  m_Name: EnemySpawner_Range_Ranger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1909071653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909071652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c8f2386c9e45a68f9f2c3b59eb85d29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Fireball.Enemies.EnemySpawner
+  enemyPrefab: {fileID: 5313649456205464426, guid: 54c91b3a2ab43afccb440a551f0ad7f6, type: 3}
+  enemyType: 1
+  maxHealth: 50
+  moveSpeed: 3.5
+  attackRange: 1.5
+  attackCooldown: 1.5
+  damage: 10
+  goldValue: 10
+  spawnInterval: 5
+  maxActiveSpawns: 3
+  maxTotalSpawns: 20
+--- !u!4 &1909071654
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909071652}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -7.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11205,4 +11205,4 @@ SceneRoots:
   - {fileID: 867025989}
   - {fileID: 888461150}
   - {fileID: 1772723971}
-  - {fileID: 1492775756}
+  - {fileID: 1909071654}

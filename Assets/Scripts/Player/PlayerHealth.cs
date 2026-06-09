@@ -33,20 +33,23 @@ namespace Fireball.Player
 
         public void TakeDamage(float amount)
         {
-            if (playerStats == null) return;
+            Debug.Log($"PlayerHealth.TakeDamage called with amount: {amount}");
+            if (playerStats == null)
+            {
+                Debug.LogError("PlayerHealth: playerStats is NULL! Cannot apply damage.");
+                return;
+            }
 
             // Apply armor reduction (e.g., each armor level reduces damage by 10%, max 50%)
             float reduction = Mathf.Min(playerStats.armorLevel * 0.1f, 0.5f);
             float finalDamage = amount * (1f - reduction);
 
-            if (reduction > 0)
-            {
-                Debug.Log($"Armor reduced damage from {amount:F1} to {finalDamage:F1} (Reduction: {reduction * 100:F0}%)");
-            }
+            Debug.Log($"Applying final damage: {finalDamage} (Current HP: {playerStats.currentHealth})");
 
             playerStats.currentHealth -= finalDamage;
             if (playerStats.currentHealth <= 0)
             {
+                Debug.Log("Player HP reached 0 or less. Dying...");
                 Die();
             }
         }

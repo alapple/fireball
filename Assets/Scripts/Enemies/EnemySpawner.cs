@@ -60,14 +60,16 @@ namespace Fireball.Enemies
                 EnemyBase enemy = newEnemyObj.GetComponent<EnemyBase>();
                 if (enemy == null)
                 {
-                    if (enemyType == EnemyType.Melee)
-                    {
-                        enemy = newEnemyObj.AddComponent<RivalMelee>();
-                    }
-                    else
-                    {
-                        enemy = newEnemyObj.AddComponent<RivalRanged>();
-                    }
+                    if (enemyType == EnemyType.Melee) enemy = newEnemyObj.AddComponent<RivalMelee>();
+                    else enemy = newEnemyObj.AddComponent<RivalRanged>();
+                }
+                else
+                {
+                    // If it has a script but it's the wrong type, we should probably warn the user
+                    if (enemyType == EnemyType.Melee && !(enemy is RivalMelee))
+                        Debug.LogWarning($"Spawner at {transform.position} is set to Melee but prefab {enemyPrefab.name} already has {enemy.GetType().Name}!");
+                    else if (enemyType == EnemyType.Ranged && !(enemy is RivalRanged))
+                        Debug.LogWarning($"Spawner at {transform.position} is set to Ranged but prefab {enemyPrefab.name} already has {enemy.GetType().Name}!");
                 }
 
                 // Ensure it has a NavMeshAgent

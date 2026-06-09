@@ -28,7 +28,19 @@ namespace Fireball.Enemies
             // Movement Logic
             if (currentRole == SquadRole.Strafe)
             {
-                ExecuteStrafe();
+                if (distanceToPlayer > shootRange)
+                {
+                    // Too far! Get closer even if in strafe mode
+                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+                    {
+                        agent.isStopped = false;
+                        agent.SetDestination(player.position);
+                    }
+                }
+                else
+                {
+                    ExecuteStrafe();
+                }
             }
             else
             {
@@ -37,12 +49,20 @@ namespace Fireball.Enemies
                     // Too close! Back up
                     Vector3 dirFromPlayer = (transform.position - player.position).normalized;
                     Vector3 retreatPos = player.position + dirFromPlayer * preferredDistance;
-                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh) agent.SetDestination(retreatPos);
+                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+                    {
+                        agent.isStopped = false;
+                        agent.SetDestination(retreatPos);
+                    }
                 }
                 else if (distanceToPlayer > preferredDistance * 1.2f)
                 {
                     // Too far! Get closer
-                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh) agent.SetDestination(player.position);
+                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+                    {
+                        agent.isStopped = false;
+                        agent.SetDestination(player.position);
+                    }
                 }
                 else
                 {
@@ -81,6 +101,8 @@ namespace Fireball.Enemies
         {
             if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
 
+            agent.isStopped = false;
+
             if (Time.time >= nextStrafeTime)
             {
                 strafeDir = Random.value > 0.5f ? transform.right : -transform.right;
@@ -116,16 +138,17 @@ namespace Fireball.Enemies
                 Vector3 targetDir = firePoint.forward;
                 if (player != null)
                 {
-                    targetDir = ((player.position + Vector3.up * 1f) - firePoint.position).normalized;
+                    targetDir = ((player.position + Vector3.up * 0.5f) - firePoint.position).normalized;
                 }
 
                 // 2. Spawn the projectile
+                Debug.DrawRay(firePoint.position, targetDir * shootRange, Color.yellow, 2f);
                 GameObject projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.LookRotation(targetDir));
                 
                 // 3. Setup the projectile script and LOCK the flight path
                 EnemyProjectile projScript = projectile.GetComponent<EnemyProjectile>();
                 if (projScript == null) projScript = projectile.AddComponent<EnemyProjectile>();
-                projScript.SetDirection(targetDir);
+                projScript.Initialize(targetDir, damage);
 
                 // 4. APPLY VISUAL OFFSET (This only changes the rotation, not the path)
                 projectile.transform.Rotate(rotationOffset);

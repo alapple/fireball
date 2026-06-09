@@ -33,6 +33,11 @@ namespace Fireball.Enemies
             animator = GetComponentInChildren<Animator>(); // Characters often have animator on a child model
             if (animator == null) animator = GetComponent<Animator>();
 
+            if (animator == null)
+            {
+                Debug.LogWarning($"{name} could not find an Animator component! Animations will not play.");
+            }
+
             if (agent != null)
             {
                 agent.speed = moveSpeed;
@@ -90,6 +95,9 @@ namespace Fireball.Enemies
                 FindPlayer();
                 if (player == null) return;
             }
+
+            // ALWAYS visualize forward and range in Scene View for debugging
+            Debug.DrawRay(transform.position + Vector3.up, transform.forward * attackRange, Color.cyan);
 
             float distance = Vector3.Distance(transform.position, player.position);
 
