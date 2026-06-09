@@ -88,6 +88,8 @@ namespace Fireball.Enemies
             currentHealth = maxHealth;
         }
 
+        private bool hasAttemptedWarp = false;
+
         protected virtual void Update()
         {
             if (player == null)
@@ -101,30 +103,33 @@ namespace Fireball.Enemies
 
             float distance = Vector3.Distance(transform.position, player.position);
 
-            // NAVMESH FALLBACK SYSTEM
+            // NAVMESH ONLY MOVEMENT
             if (agent != null && agent.enabled && agent.isOnNavMesh)
             {
                 HandleBehavior(distance);
             }
             else
             {
-                // Simple 'Slide towards player' fallback so the game doesn't break without NavMesh
-                if (distance > attackRange)
+                // AUTO-WARP ATTEMPT: If we're off-mesh, try to find the nearest valid spot once
+                if (!hasAttemptedWarp && agent != null && agent.enabled)
                 {
-                    Vector3 moveDir = (player.position - transform.position).normalized;
-                    moveDir.y = 0;
-                    transform.position += moveDir * moveSpeed * Time.deltaTime;
-                    
-                    if (moveDir != Vector3.zero)
-                        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDir), Time.deltaTime * 10f);
-                    
-                    if (animator != null) animator.SetFloat("Speed", moveSpeed);
+                    if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 10f, NavMesh.AllAreas))
+                    {
+                        Debug.Log($"{name} was off-mesh. Warping to nearest valid point at {hit.position}");
+                        agent.Warp(hit.position);
+                        hasAttemptedWarp = true;
+                        return; // Wait for next frame
+                    }
+                    hasAttemptedWarp = true; // Only try once to avoid performance issues
                 }
-                else
+
+                // If still not on NavMesh, don't move.
+                if (Time.frameCount % 120 == 0) // Don't spam
                 {
-                    if (animator != null) animator.SetFloat("Speed", 0);
-                    HandleBehavior(distance); // Still allow attack logic
+                    Debug.LogWarning($"{name} is NOT on a NavMesh! Position: {transform.position}. Ensure your floor is marked 'Static' and Baked.");
                 }
+                
+                if (animator != null) animator.SetFloat("Speed", 0);
             }
         }
 

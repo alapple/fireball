@@ -49,7 +49,7 @@ namespace Fireball.Enemies
             {
                 // FIND A SAFE POSITION ON THE NAVMESH
                 Vector3 spawnPos = transform.position;
-                if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out UnityEngine.AI.NavMeshHit hit, 5f, UnityEngine.AI.NavMesh.AllAreas))
+                if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out UnityEngine.AI.NavMeshHit hit, 10f, UnityEngine.AI.NavMesh.AllAreas))
                 {
                     spawnPos = hit.position;
                 }
@@ -84,6 +84,12 @@ namespace Fireball.Enemies
                 agent.angularSpeed = 360f;
                 agent.stoppingDistance = (enemyType == EnemyType.Melee) ? 1.2f : 6f;
                 agent.enabled = true;
+
+                // FINAL CHECK: If it's still not on NavMesh, warn the user
+                if (!agent.isOnNavMesh)
+                {
+                    Debug.LogError($"SPAWNER ERROR: {newEnemyObj.name} spawned at {spawnPos} is NOT on the NavMesh! Check your Navigation baking.");
+                }
 
                 // Ensure it has a Collider for hit detection
                 if (newEnemyObj.GetComponent<Collider>() == null)
