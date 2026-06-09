@@ -7,8 +7,10 @@ namespace Fireball.Editor
 {
     public class EnemyPrefabCreator : EditorWindow
     {
+        private enum EnemyType { Melee, Ranged }
         private GameObject modelFBX;
-        private string prefabName = "RivalMelee_Knight";
+        private string prefabName = "Enemy_New";
+        private EnemyType selectedType = EnemyType.Melee;
 
         [MenuItem("Tools/Fireball/Enemy Prefab Creator")]
         public static void ShowWindow()
@@ -22,8 +24,9 @@ namespace Fireball.Editor
             
             modelFBX = (GameObject)EditorGUILayout.ObjectField("Model FBX", modelFBX, typeof(GameObject), false);
             prefabName = EditorGUILayout.TextField("Prefab Name", prefabName);
+            selectedType = (EnemyType)EditorGUILayout.EnumPopup("Enemy Type", selectedType);
 
-            if (GUILayout.Button("Create Melee Enemy Prefab"))
+            if (GUILayout.Button("Create Enemy Prefab"))
             {
                 CreatePrefab();
             }
@@ -40,14 +43,15 @@ namespace Fireball.Editor
             // 1. Instantiate the FBX in the scene temporarily
             GameObject enemyObj = (GameObject)PrefabUtility.InstantiatePrefab(modelFBX);
             enemyObj.name = prefabName;
+            enemyObj.tag = "Enemy";
 
             // 2. Add NavMeshAgent
             NavMeshAgent agent = enemyObj.GetComponent<NavMeshAgent>();
             if (agent == null) agent = enemyObj.AddComponent<NavMeshAgent>();
-            agent.speed = 4f;
+            agent.speed = (selectedType == EnemyType.Melee) ? 4f : 3.5f;
             agent.acceleration = 12f;
             agent.angularSpeed = 360f;
-            agent.stoppingDistance = 1.2f;
+            agent.stoppingDistance = (selectedType == EnemyType.Melee) ? 1.2f : 6f;
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
 
             // 3. Add Collider
@@ -58,8 +62,16 @@ namespace Fireball.Editor
             col.height = 2f;
 
             // 4. Add AI Script
-            RivalMelee melee = enemyObj.GetComponent<RivalMelee>();
-            if (melee == null) melee = enemyObj.AddComponent<RivalMelee>();
+            if (selectedType == EnemyType.Melee)
+            {
+                if (enemyObj.GetComponent<RivalRanged>()) DestroyImmediate(enemyObj.GetComponent<RivalRanged>());
+                if (enemyObj.GetComponent<RivalMelee>() == null) enemyObj.AddComponent<RivalMelee>();
+            }
+            else
+            {
+                if (enemyObj.GetComponent<RivalMelee>()) DestroyImmediate(enemyObj.GetComponent<RivalMelee>());
+                if (enemyObj.GetComponent<RivalRanged>() == null) enemyObj.AddComponent<RivalRanged>();
+            }
 
             // 5. Save as Prefab
             string path = "Assets/Prefabs/" + prefabName + ".prefab";
@@ -73,7 +85,7 @@ namespace Fireball.Editor
             // 6. Cleanup scene
             DestroyImmediate(enemyObj);
 
-            Debug.Log("Successfully created Enemy Prefab at: " + path);
+            Debug.Log("Successfully created " + selectedType + " Enemy Prefab at: " + path);
             AssetDatabase.Refresh();
         }
     }

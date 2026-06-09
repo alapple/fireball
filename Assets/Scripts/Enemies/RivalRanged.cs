@@ -7,7 +7,9 @@ namespace Fireball.Enemies
         [Header("Ranged Settings")]
         [SerializeField] private GameObject projectilePrefab;
         [SerializeField] private Transform firePoint;
+        [SerializeField] private Vector3 rotationOffset = new Vector3(90, 0, 0);
         [SerializeField] private float preferredDistance = 8f;
+        [SerializeField] private float shootRange = 12f;
         [SerializeField] private float strafeSpeed = 2f;
 
         private Vector3 strafeDir;
@@ -15,34 +17,63 @@ namespace Fireball.Enemies
 
         protected override void HandleBehavior(float distanceToPlayer)
         {
-            if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
+            if (player == null) return;
 
+            // Update Animator speed
+            if (animator != null && agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+            {
+                animator.SetFloat("Speed", agent.velocity.magnitude);
+            }
+
+            // Movement Logic
             if (currentRole == SquadRole.Strafe)
             {
                 ExecuteStrafe();
             }
             else
             {
-                if (distanceToPlayer <= preferredDistance)
+                if (distanceToPlayer < preferredDistance * 0.8f)
                 {
-                    // Try to keep distance
-                    Vector3 dirToPlayer = (transform.position - player.position).normalized;
-                    Vector3 retreatPos = player.position + dirToPlayer * preferredDistance;
-                    agent.SetDestination(retreatPos);
+                    // Too close! Back up
+                    Vector3 dirFromPlayer = (transform.position - player.position).normalized;
+                    Vector3 retreatPos = player.position + dirFromPlayer * preferredDistance;
+                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh) agent.SetDestination(retreatPos);
+                }
+                else if (distanceToPlayer > preferredDistance * 1.2f)
+                {
+                    // Too far! Get closer
+                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh) agent.SetDestination(player.position);
                 }
                 else
                 {
-                    agent.SetDestination(player.position);
+                    // In the sweet spot
+                    if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh) agent.isStopped = true;
                 }
             }
 
-            if (distanceToPlayer <= preferredDistance * 1.5f)
+            // Shooting Logic
+            if (distanceToPlayer <= shootRange)
             {
-                transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
+                RotateTowards(player.position);
+
                 if (Time.time >= lastAttackTime + attackCooldown)
                 {
-                    Shoot();
+                    PrepareShoot();
                 }
+            }
+            else
+            {
+                if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh) agent.isStopped = false;
+            }
+        }
+
+        private void RotateTowards(Vector3 target)
+        {
+            Vector3 dir = (target - transform.position).normalized;
+            dir.y = 0;
+            if (dir != Vector3.zero)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 10f);
             }
         }
 
@@ -60,13 +91,44 @@ namespace Fireball.Enemies
             agent.SetDestination(strafePos);
         }
 
-        private void Shoot()
+        private void PrepareShoot()
         {
             lastAttackTime = Time.time;
-            if (projectilePrefab != null)
+            if (animator != null)
             {
-                GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-                // Projectile logic should handle movement and damage
+                animator.SetTrigger("Shoot");
+            }
+            else
+            {
+                // Fallback if no animator
+                PerformShoot();
+            }
+        }
+
+        // THIS METHOD IS CALLED BY ANIMATION EVENT
+        public void PerformShoot()
+        {
+            if (projectilePrefab != null && firePoint != null)
+            {
+                Debug.Log($"{name} fired a projectile!");
+                
+                // 1. Calculate the actual flight path towards the player
+                Vector3 targetDir = firePoint.forward;
+                if (player != null)
+                {
+                    targetDir = ((player.position + Vector3.up * 1f) - firePoint.position).normalized;
+                }
+
+                // 2. Spawn the projectile
+                GameObject projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.LookRotation(targetDir));
+                
+                // 3. Setup the projectile script and LOCK the flight path
+                EnemyProjectile projScript = projectile.GetComponent<EnemyProjectile>();
+                if (projScript == null) projScript = projectile.AddComponent<EnemyProjectile>();
+                projScript.SetDirection(targetDir);
+
+                // 4. APPLY VISUAL OFFSET (This only changes the rotation, not the path)
+                projectile.transform.Rotate(rotationOffset);
             }
         }
     }

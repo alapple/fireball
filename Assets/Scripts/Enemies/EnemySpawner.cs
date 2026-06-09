@@ -6,8 +6,11 @@ namespace Fireball.Enemies
 {
     public class EnemySpawner : MonoBehaviour
     {
+        public enum EnemyType { Melee, Ranged }
+
         [Header("Prefab")]
         [SerializeField] private GameObject enemyPrefab;
+        [SerializeField] private EnemyType enemyType = EnemyType.Melee;
 
         [Header("Stats Overrides")]
         [SerializeField] private float maxHealth = 50f;
@@ -50,19 +53,21 @@ namespace Fireball.Enemies
                 {
                     spawnPos = hit.position;
                 }
-                else
-                {
-                    Debug.LogWarning($"Spawner {name} could not find NavMesh at {transform.position}. Enemy might float!");
-                }
 
                 GameObject newEnemyObj = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
                 
-                // Ensure it has the base AI script (Melee by default if missing)
+                // Ensure it has the correct AI script
                 EnemyBase enemy = newEnemyObj.GetComponent<EnemyBase>();
                 if (enemy == null)
                 {
-                    Debug.Log($"Adding RivalMelee to {newEnemyObj.name} because it was missing an AI script.");
-                    enemy = newEnemyObj.AddComponent<RivalMelee>();
+                    if (enemyType == EnemyType.Melee)
+                    {
+                        enemy = newEnemyObj.AddComponent<RivalMelee>();
+                    }
+                    else
+                    {
+                        enemy = newEnemyObj.AddComponent<RivalRanged>();
+                    }
                 }
 
                 // Ensure it has a NavMeshAgent
@@ -75,8 +80,8 @@ namespace Fireball.Enemies
                 agent.speed = moveSpeed;
                 agent.acceleration = 12f;
                 agent.angularSpeed = 360f;
-                agent.stoppingDistance = 1.2f;
-                agent.enabled = true; // Ensure it's on
+                agent.stoppingDistance = (enemyType == EnemyType.Melee) ? 1.2f : 6f;
+                agent.enabled = true;
 
                 // Ensure it has a Collider for hit detection
                 if (newEnemyObj.GetComponent<Collider>() == null)
