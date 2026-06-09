@@ -11,6 +11,9 @@ namespace Fireball.Weapons
         [SerializeField] private BottleWeapon leftHandWeapon;
         [SerializeField] private BottleWeapon rightHandWeapon;
 
+        public BottleWeapon LeftHandWeapon => leftHandWeapon;
+        public BottleWeapon RightHandWeapon => rightHandWeapon;
+
         [Header("Inventory")]
         [SerializeField] private List<BottleWeapon> allWeapons = new List<BottleWeapon>();
         

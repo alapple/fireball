@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Fireball.Core;
+using Fireball.UI;
 
 namespace Fireball.Enemies
 {
@@ -138,6 +139,13 @@ namespace Fireball.Enemies
         public virtual void TakeDamage(float amount)
         {
             currentHealth -= amount;
+            
+            // Damage Popup
+            if (DamagePopupManager.Instance != null)
+            {
+                DamagePopupManager.Instance.CreatePopup(transform.position + Vector3.up * 2f, amount);
+            }
+
             if (currentHealth <= 0)
             {
                 Die();
