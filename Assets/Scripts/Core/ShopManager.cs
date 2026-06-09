@@ -20,7 +20,14 @@ namespace Fireball.Core
 
         private void OnEnable()
         {
-            var root = GetComponent<UIDocument>().rootVisualElement;
+            var uiDoc = GetComponent<UIDocument>();
+            if (uiDoc == null || uiDoc.rootVisualElement == null)
+            {
+                Debug.LogWarning($"ShopManager on {gameObject.name} is missing a UIDocument or has no Root Element. UI will not initialize.");
+                return;
+            }
+
+            var root = uiDoc.rootVisualElement;
 
             _shopPanel = root.Q<VisualElement>("ShopPanel");
             _goldLabel = root.Q<Label>("GoldLabel");

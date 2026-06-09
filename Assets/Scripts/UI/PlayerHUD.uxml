@@ -1,8 +1,30 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement style="flex-grow: 1; justify-content: space-between; padding-left: 20px; padding-right: 20px; padding-top: 20px; padding-bottom: 20px;">
+        <!-- Top Bar: Health and Gold -->
         <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
-            <ui:ProgressBar value="100" title="HP: 100 / 100" name="HealthBar" style="width: 300px; height: 30px;" />
-            <ui:Label text="$ 0" name="GoldDisplay" style="font-size: 30px; color: rgb(255, 215, 0); -unity-font-style: bold;" />
+            <ui:ProgressBar value="100" title="HP: 100 / 100" name="HealthBar" style="width: 350px; height: 35px; border-width: 2px; border-color: white; border-radius: 5px;" />
+            <ui:Label text="$ 0" name="GoldDisplay" style="font-size: 35px; color: rgb(255, 215, 0); -unity-font-style: bold; text-shadow: 2px 2px 2px black;" />
+        </ui:VisualElement>
+
+        <!-- Bottom: Ammo Displays -->
+        <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: flex-end;">
+            <!-- Left Hand Ammo -->
+            <ui:VisualElement style="width: 200px;">
+                <ui:Label text="100" name="LeftAmmoLabel" style="font-size: 40px; color: white; -unity-font-style: bold; margin-bottom: 5px; text-shadow: 2px 2px 2px black;" />
+                <ui:VisualElement name="LeftAmmoBar" style="height: 15px; background-color: rgba(0, 0, 0, 0.5); border-width: 1px; border-color: white;">
+                    <ui:VisualElement name="LeftAmmoBarInner" style="height: 100%; width: 100%; background-color: rgb(0, 200, 255);" />
+                </ui:VisualElement>
+                <ui:Label text="CHAMPAGNE" style="font-size: 12px; color: white; -unity-text-align: middle-center; opacity: 0.7;" />
+            </ui:VisualElement>
+
+            <!-- Right Hand Ammo -->
+            <ui:VisualElement style="width: 200px;">
+                <ui:Label text="100" name="RightAmmoLabel" style="font-size: 40px; color: white; -unity-font-style: bold; margin-bottom: 5px; text-shadow: 2px 2px 2px black; -unity-text-align: upper-right;" />
+                <ui:VisualElement name="RightAmmoBar" style="height: 15px; background-color: rgba(0, 0, 0, 0.5); border-width: 1px; border-color: white;">
+                    <ui:VisualElement name="RightAmmoBarInner" style="height: 100%; width: 100%; background-color: rgb(0, 200, 255); align-self: flex-end;" />
+                </ui:VisualElement>
+                <ui:Label text="MOONSHINE" style="font-size: 12px; color: white; -unity-text-align: middle-center; opacity: 0.7;" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

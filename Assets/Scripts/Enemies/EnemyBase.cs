@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Fireball.Core;
+using Fireball.UI;
 
 namespace Fireball.Enemies
 {
@@ -41,7 +42,14 @@ namespace Fireball.Enemies
             if (agent != null)
             {
                 agent.speed = moveSpeed;
-                agent.isStopped = false;
+                if (agent.isOnNavMesh)
+                {
+                    agent.isStopped = false;
+                }
+                else
+                {
+                    Debug.LogWarning($"{name} spawned but is not on a NavMesh. Movement will use fallback.");
+                }
             }
             
             FindPlayer();
@@ -140,9 +148,27 @@ namespace Fireball.Enemies
 
         protected abstract void HandleBehavior(float distanceToPlayer);
 
+        private float _damageBuffer = 0f;
+        private float _lastPopupTime = 0f;
+        private const float POPUP_COOLDOWN = 0.15f;
+
         public virtual void TakeDamage(float amount)
         {
             currentHealth -= amount;
+            _damageBuffer += amount;
+            
+            // Damage Popup Logic: Batch small damage (like flamethrower) 
+            // but show large damage (like molotov) immediately.
+            if (Time.time - _lastPopupTime >= POPUP_COOLDOWN || amount > 5f)
+            {
+                if (DamagePopupManager.Instance != null && _damageBuffer > 0.1f)
+                {
+                    DamagePopupManager.Instance.CreatePopup(transform.position + Vector3.up * 2f, _damageBuffer);
+                    _damageBuffer = 0f;
+                    _lastPopupTime = Time.time;
+                }
+            }
+
             if (currentHealth <= 0)
             {
                 Die();
