@@ -32,8 +32,29 @@ namespace Fireball.UI
             if (_settingsButton != null) _settingsButton.clicked += ToggleSettings;
             if (_quizButton != null) _quizButton.clicked += ToggleQuiz;
 
+            // Find close buttons in panels
+            root.Q<Button>("CloseSettings")?.RegisterCallback<ClickEvent>(evt => ToggleSettings());
+            root.Q<Button>("CloseQuiz")?.RegisterCallback<ClickEvent>(evt => ToggleQuiz());
+
+            // Initial State
             if (_settingsPanel != null) _settingsPanel.style.display = DisplayStyle.None;
             if (_quizPanel != null) _quizPanel.style.display = DisplayStyle.None;
+
+            // Setup Cursor
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
+
+            // Hover Effects
+            RegisterButtonEffects(_playButton, new Color(1f, 0.4f, 0f), new Color(0.7f, 0.2f, 0f));
+            RegisterButtonEffects(_settingsButton, new Color(0.3f, 0.3f, 0.3f), new Color(0.2f, 0.2f, 0.2f));
+            RegisterButtonEffects(_quizButton, new Color(0.3f, 0.3f, 0.3f), new Color(0.2f, 0.2f, 0.2f));
+        }
+
+        private void RegisterButtonEffects(Button button, Color normalColor, Color hoverColor)
+        {
+            if (button == null) return;
+            button.RegisterCallback<MouseEnterEvent>(evt => button.style.backgroundColor = hoverColor);
+            button.RegisterCallback<MouseLeaveEvent>(evt => button.style.backgroundColor = normalColor);
         }
 
         private void OnPlayClicked()

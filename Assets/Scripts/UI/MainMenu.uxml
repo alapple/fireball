@@ -1,7 +1,28 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Button text="Button" name="PlayButton"/>
-    <ui:Button text="Button" name="SettingsButton"/>
-    <ui:Button text="Button" name="QuitButton"/>
-    <ui:VisualElement name="SettingsPanel" style="flex-grow: 1;"/>
-    <ui:VisualElement name="QuitPanel" style="flex-grow: 1;"/>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Background" style="flex-grow: 1; background-color: rgb(20, 20, 20); justify-content: center; align-items: center;">
+        <!-- Background "Glow" or Decoration could go here -->
+        
+        <ui:VisualElement name="MenuContainer" style="width: 400px; padding: 40px; background-color: rgba(40, 40, 40, 0.9); border-radius: 15px; border-width: 2px; border-color: rgb(255, 100, 0);">
+            <ui:Label text="FIREBALL" style="font-size: 80px; color: rgb(255, 100, 0); -unity-font-style: bold; -unity-text-align: middle-center; margin-bottom: 40px; text-shadow: 4px 4px 5px rgba(0, 0, 0, 0.8);" />
+            
+            <ui:Button text="START GAME" name="PlayButton" class="menu-button" style="height: 60px; font-size: 24px; -unity-font-style: bold; color: white; background-color: rgb(180, 50, 0); border-radius: 10px; margin-bottom: 15px; border-width: 0;" />
+            <ui:Button text="SETTINGS" name="SettingsButton" class="menu-button" style="height: 50px; font-size: 20px; color: white; background-color: rgb(60, 60, 60); border-radius: 10px; margin-bottom: 15px; border-width: 0;" />
+            <ui:Button text="CREDITS" name="QuizButton" class="menu-button" style="height: 50px; font-size: 20px; color: white; background-color: rgb(60, 60, 60); border-radius: 10px; margin-bottom: 15px; border-width: 0;" />
+        </ui:VisualElement>
+
+        <!-- Overlay Panels -->
+        <ui:VisualElement name="SettingsPanel" style="position: absolute; width: 300px; height: 200px; background-color: rgb(50, 50, 50); border-radius: 10px; display: none; padding: 20px; border-width: 1px; border-color: white;">
+            <ui:Label text="SETTINGS" style="color: white; -unity-font-style: bold; margin-bottom: 20px;" />
+            <ui:Label text="Volume: 100%" style="color: grey;" />
+            <ui:Label text="Sensitivity: High" style="color: grey;" />
+            <ui:Button text="CLOSE" name="CloseSettings" style="margin-top: auto;" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="QuizPanel" style="position: absolute; width: 300px; height: 200px; background-color: rgb(50, 50, 50); border-radius: 10px; display: none; padding: 20px; border-width: 1px; border-color: white;">
+            <ui:Label text="CREDITS" style="color: white; -unity-font-style: bold; margin-bottom: 20px;" />
+            <ui:Label text="Developed by Fireball Team" style="color: grey;" />
+            <ui:Button text="CLOSE" name="CloseQuiz" style="margin-top: auto;" />
+        </ui:VisualElement>
+
+    </ui:VisualElement>
 </ui:UXML>
